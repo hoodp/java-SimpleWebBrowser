@@ -125,7 +125,6 @@ public class MyURL {
 	 */
 	public String toString() {
 		return String.format("%s://%s:%d%s", scheme, domainName, port, path);
-		//return String.format(scheme + "://" + domainName + ":" + port + path);
 	}
 
 	// Needed in order to use MyURL as a key to a HashMap
