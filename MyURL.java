@@ -64,8 +64,12 @@ public class MyURL {
 
 		// check if port is set
 		if (portIndex != schemeIndex) {
+			
+			// get port between domain name & path index
 			if (pathIndex != -1)
 				port = Integer.parseInt(url.substring(portIndex + 1, pathIndex));
+			
+			// port is the last part of the string
 			else
 				port = Integer.parseInt(url.substring(portIndex + 1));
 		}
@@ -120,7 +124,8 @@ public class MyURL {
 	 * @return this URL formatted as a string.
 	 */
 	public String toString() {
-		return String.format(scheme + "://" + domainName + ":" + port + path);
+		return String.format("%s://%s:%d%s", scheme, domainName, port, path);
+		//return String.format(scheme + "://" + domainName + ":" + port + path);
 	}
 
 	// Needed in order to use MyURL as a key to a HashMap

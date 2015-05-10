@@ -2,8 +2,6 @@
 /**
  * @author Paul Hood
  */
-import javax.imageio.ImageIO;
-
 import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -11,6 +9,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 
 public class WebTransactionClient {
@@ -30,9 +30,8 @@ public class WebTransactionClient {
 		out = new PrintWriter(socket.getOutputStream(), true);
 		
 		// send get request
-		out.println("GET " + url.path() + " HTTP/1.1");
-		out.println("Host: " + url.domainName());
-		out.println("");
+		out.printf("GET %s HTTP/1.1\nHost: %s\n\n", url.path(), 
+				url.domainName());
 		out.flush();
 		
 		// first line is response string
@@ -52,6 +51,7 @@ public class WebTransactionClient {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public String getText() throws IOException {
 		StringBuffer result = new StringBuffer();
 
