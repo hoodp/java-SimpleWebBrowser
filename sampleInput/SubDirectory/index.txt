@@ -1,0 +1,6 @@
+
+This is a file in a subdirectory
+
+[[index2.txt This is another file in the same subdirectory]]
+
+[[../basic.txt Back to the main page]]

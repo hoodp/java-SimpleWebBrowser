@@ -1,0 +1,18 @@
+
+Displaying several images
+
+
+Local 1:
+
+<<logo1.png>>
+
+
+Local 2:
+
+<<logo2.jpeg>>
+
+Local 3:
+
+<<gvsu3.gif>>
+
+[[../basic.txt back]]

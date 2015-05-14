@@ -1,0 +1,9 @@
+Displaying images from a subdirectory
+
+<<Images/logo1.png>>
+
+<<Images/logo2.jpeg>>
+
+<<Images/gvsu3.gif>>
+
+[[basic.txt Back to Main Page]]

@@ -1,0 +1,11 @@
+This is a sample input for the "starter" web browser I provided.
+
+It should render single, marked words in *bold* type.
+(Notice that it also removes the markup.)
+
+Clicking on a color link like the ones below should change the text color:
+(#FF0000)
+(#00FF00)
+(#0000FF)
+
+(But notice that the color changes aren't permanent).
