@@ -1,9 +1,16 @@
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
+import javax.swing.JPanel;
 
 /**
  * This class demonstrates a simple technique of laying out text "by hand"
@@ -11,54 +18,30 @@ import java.util.Scanner;
  * Also demonstrates how to change fonts and colors.
  * <p/>
  * Created by kurmasz on 12/17/14.
+ * 
+ * @author Paul Hood
+ * @version 05-14-2015
  */
 public class Display extends JPanel {
 
 	private static final int MARGIN = 10; // the margin around the edge of the window.
 	private List<String> content;  // the text that is to be displayed.
-	private Color defaultColor; // the default text color
 
 
 	// This Map is what makes links:  Each Rectangle is a link --- an area on the screen that can be clicked.
 	// The rectangle is the key.  The value, in this case, is the color that should be used when the link is clicked.
 	// When building a "real" browser, the links are also areas on the screen, but the corresponding value is the URL
 	// that should be loaded when the link is clicked.
-	private Map<Rectangle, Color> links = new HashMap<Rectangle, Color>();
+	private Map<Rectangle, String> links = new HashMap<Rectangle, String>();
 
 
 	/**
 	 * Set the text that is to be displayed.
 	 *
-	 * @param text_in the text that is to be displayed
+	 * @param text_in the text that is to be dis played
 	 */
 	public void setText(List<String> text_in) {
 		content = text_in;
-		
-		// 
-		for (String s : content) {
-			int lastIndex = s.length() - 1;
-			
-			// check for bold text
-			if (s.charAt(0) == '*' && s.charAt(lastIndex) == '*')
-				return;
-			else if (s.charAt(0) == '_' && s.charAt(lastIndex) == '_')
-				return;
-			else if (s.charAt(0) == '[' 
-					&& s.charAt(1) == '[' 
-					&& s.charAt(lastIndex) == ']' 
-					&& s.charAt(lastIndex - 1) == ']')
-				return;
-		}
-		defaultColor = Color.black;
-	}
-
-	/**
-	 * Set the text color
-	 *
-	 * @param c the desired text color
-	 */
-	public void setColor(Color c) {
-		defaultColor = c;
 	}
 
 	/**
@@ -79,33 +62,112 @@ public class Display extends JPanel {
 		FontMetrics metrics = g.getFontMetrics();
 		int line_height = metrics.getHeight();
 		int panel_width = getWidth() - MARGIN * 2;
-
 		int x = MARGIN;
 		int y = line_height;
 
 		// save the original font in case we change it.
 		Font originalFont = g.getFont();
 
+		// booleans for italics, bold, and links set to false
+		boolean bold, italic, link;
+		bold = italic = link = false;
 
 		// Iterate over each line.
 		for (String line : content) {
 			Scanner words = new Scanner(line);
-
+			String url = null;
+			
 			// iterate over each word.
 			while (words.hasNext()) {
-
+				String nextWord = words.next().trim();
+				
+				// original style for word
 				int style = Font.PLAIN;
-				String nextWord = words.next();
 
+				// start checking for adding style markup
+				// check for start of bold markup 
+				if (hasMarkup(nextWord, "*", true)) {
+					bold = true;
 
-				// A simple example of how to handle a *one-word* markup 
-				// Remember, your assignment will use multi-word markup.
-				if (nextWord.startsWith("*") && nextWord.endsWith("*") && nextWord.length() > 1) {
-					// remove the markup.
-					nextWord = nextWord.substring(1, nextWord.length() - 1);
-					style = Font.BOLD;
+					// remove character at beginning of string
+					nextWord = nextWord.substring(1);
 				}
 
+				// check for start of italic markup
+				if (hasMarkup(nextWord, "_", true)) {
+					italic = true;
+
+					// remove markup from beginning of string
+					nextWord = nextWord.substring(1);
+				}
+
+				if (hasMarkup(nextWord, "[[", true)) {
+					link = true;
+					
+					// remove starting brackets
+					nextWord = nextWord.substring(2);
+					
+					// set url 
+					url = nextWord;
+							
+					// check for closing markup bracket in url
+					if (url.contains("]]"))
+						url = url.substring(0, url.length() - 2);
+					
+					// skip to next word if more than one word in link
+					if (line.split(" ").length != 1 && words.hasNext())
+						nextWord = words.next();
+				}
+
+
+				// remove plain style and add bold
+				if (bold)
+					style = Font.BOLD;
+
+				// add italic font to style
+				if (italic)
+					style += Font.ITALIC;
+				
+				// update color
+				g.setColor(link ? Color.BLUE : Color.BLACK);
+				
+				// check for link
+				if (link) {
+					
+					// create new rectangle
+					Rectangle rect = new Rectangle(x, y - line_height,
+							metrics.stringWidth(nextWord), line_height);
+					
+					// add rectangle to screen
+					g.clearRect(rect.x, rect.y, rect.width, rect.height);
+					
+					// add rectangle to hash map
+					links.put(rect, url);
+				}
+
+				// start checking for end of markup
+				// check for end of bold line
+				if (hasMarkup(nextWord, "*", false)) {
+					bold = false;
+
+					// remove char at end of string
+					nextWord = nextWord.substring(0, nextWord.length() - 1);
+				}
+
+				// check for end of italic line
+				if (hasMarkup(nextWord, "_", false)) {
+					italic = false;
+
+					// remove char at end of string
+					nextWord = nextWord.substring(0, nextWord.length() - 1);
+				}
+
+				if (hasMarkup(nextWord, "]]", false)) {
+					link = false;		
+					
+					// remove brackets at end of string
+					nextWord = nextWord.substring(0, nextWord.length() - 2);
+				}
 
 				String wordAndSpace = nextWord + " ";
 				int word_width = metrics.stringWidth(wordAndSpace);
@@ -115,25 +177,12 @@ public class Display extends JPanel {
 					x = MARGIN;
 					y += line_height;
 				}
-
-				// A simple example of how to handle links. A word of the form (#123456) will be
-				// represented as a link that, when clicked on, will change the text color.
-				Color color = getColor(nextWord);
-				if (color != null) {
-					g.setColor(color);
-					Rectangle rect = new Rectangle(x, y - line_height, word_width, line_height);
-					links.put(rect, color);
-					// g.drawRect(rect.x, rect.y, rect.width, rect.height);
-				} else {
-					g.setColor(defaultColor);
-				}
-
-
+								
 				// draw the word
 				g.setFont(originalFont.deriveFont(style));
 				g.drawString(wordAndSpace, x, y);
-
-
+				
+				
 				x += word_width;
 
 			} // end of the line
@@ -152,21 +201,6 @@ public class Display extends JPanel {
 	}
 
 	/**
-	 * Determine if the {@code word} represents a color.
-	 *
-	 * @param word the next word to be displayed
-	 * @return the {@code Color} represented by {@code word}, or {@code null} if {@code word} does not represent a color
-	 */
-
-	private static Color getColor(String word) {
-		if (word.length() == 9 && word.startsWith("(#") && word.endsWith(")")) {
-			return new Color(Integer.parseInt(word.substring(2, 8), 16));
-		} else {
-			return null;
-		}
-	}
-
-	/**
 	 * Return the color value of the color link at {@code point}, or
 	 * return {@code null} if {@code point} doesn't point to a color link.
 
@@ -176,12 +210,28 @@ public class Display extends JPanel {
 	 * return {@code null} if {@code point} doesn't point to a color link.
 	 */
 	// 
-	public Color getColor(Point point) {
-		for (Map.Entry<Rectangle, Color> entry : links.entrySet()) {
-			if (entry.getKey().contains(point)) {
-				return entry.getValue();
-			}
+	public String getUrl(Point point) {
+		for (Rectangle rect : links.keySet()) {
+			if (rect.contains(point))
+				return links.get(rect);
 		}
 		return null;
 	}
+
+	/**
+	 * Determine if string starts or ends with specific character
+	 * 
+	 * @param Character to look for 
+	 * @param true to check beginning or false to check end
+	 * 
+	 * @return true if character is found and starts or ends with value
+	 * 
+	 */
+	private boolean hasMarkup(String word, String markup, boolean start) {
+		if (start)
+			return word.startsWith(markup);
+		else
+			return word.endsWith(markup);
+	}
+
 }
