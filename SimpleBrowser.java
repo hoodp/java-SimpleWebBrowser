@@ -102,40 +102,26 @@ public class SimpleBrowser {
 	}
 
 	protected void clicked(Point point) {
-		// Respond to a mouse click in the display
-		// TODO:  Override/replace this method when you add support for links.
-		//Color c = display.getColor(point);
-		System.out.println(display.getUrl(point));
-	}
 
-//		protected void loadPage(String textInBar) {
-//			// TODO:  Replace this method with a method that loads text from a URL instead of a file.
-//			// This code here is just so that the simple browser will do something until you get the 
-//			// networking part working.
-//	
-//			File file = new File(textInBar);
-//			List<String> contents = null;
-//			try {
-//	
-//				// WARNING!! This code is missing a lot of important
-//				// checks ("does the file exist", "is it a text file", "is it readable", etc.)
-//				contents = Files.readAllLines(file.toPath(), Charset.defaultCharset());
-//			} catch (IOException e) {
-//				System.out.println("Can't open file " + file);
-//				e.printStackTrace();
-//			}
-//			display.setText(contents);
-//			frame.repaint();
-//		}
+		// get url from mouse click
+		String newUrl = display.getUrl(point);
+
+		// check for non url link page to open
+		if (newUrl != null)
+			loadPage(newUrl);
+	}
 
 	protected void loadPage(String textInBar) {
 		try {
 
-			// setup new myURL class
-			MyURL url = new MyURL(textInBar);
-			
+			// check if url should be updated or created
+			if (currentURL == null)
+				currentURL = new MyURL(textInBar);
+			else
+				currentURL = new MyURL(textInBar, currentURL);
+
 			// new web transaction client object
-			WebTransactionClient client = new WebTransactionClient(url);
+			WebTransactionClient client = new WebTransactionClient(currentURL);
 
 			// create list of lines to display
 			List<String> lines = new ArrayList<String>();

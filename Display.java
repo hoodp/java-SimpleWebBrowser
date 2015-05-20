@@ -52,6 +52,9 @@ public class Display extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 
+		// prevents display from messing up while scrolling
+		super.paintComponent(g);
+
 		// If no file has been loaded yet, then do nothing.
 		if (content == null) {
 			return;

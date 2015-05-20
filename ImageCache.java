@@ -1,5 +1,3 @@
-package edu.gvsu.cis371;
-
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
