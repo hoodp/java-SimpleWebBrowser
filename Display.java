@@ -1,16 +1,14 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import javax.swing.JPanel;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 /**
  * This class demonstrates a simple technique of laying out text "by hand"
@@ -33,7 +31,14 @@ public class Display extends JPanel {
 	// When building a "real" browser, the links are also areas on the screen, but the corresponding value is the URL
 	// that should be loaded when the link is clicked.
 	private Map<Rectangle, String> links = new HashMap<Rectangle, String>();
+	private SimpleBrowser browser;
 
+	/**
+	 * set the browser variable for retreived image cache
+	 */
+	public void setBrowser(SimpleBrowser browser) {
+		this.browser = browser;
+	}
 
 	/**
 	 * Set the text that is to be displayed.
@@ -79,11 +84,24 @@ public class Display extends JPanel {
 		for (String line : content) {
 			Scanner words = new Scanner(line);
 			String url = null;
-			
-			// iterate over each word.
+
+			// iterate over each word
 			while (words.hasNext()) {
 				String nextWord = words.next().trim();
-				
+
+				// check for an image
+				if (hasMarkup(nextWord, "<<", true)
+						&& hasMarkup(nextWord, ">>", false)) {
+					nextWord = nextWord.substring(2, nextWord.length() - 2);
+					Image image = browser.getCachedImage(nextWord);
+					System.out.println(image.getHeight(null) + " " + image.getWidth(null));
+					x = MARGIN;
+					y += line_height + image.getHeight(null);
+					g.drawImage(image, x, y, image.getWidth(null), image.getHeight(null), null);
+					y += line_height;
+					continue;
+				}
+
 				// original style for word
 				int style = Font.PLAIN;
 
@@ -121,7 +139,6 @@ public class Display extends JPanel {
 					if (line.split(" ").length != 1 && words.hasNext())
 						nextWord = words.next();
 				}
-
 
 				// remove plain style and add bold
 				if (bold)
@@ -185,7 +202,6 @@ public class Display extends JPanel {
 				g.setFont(originalFont.deriveFont(style));
 				g.drawString(wordAndSpace, x, y);
 				
-				
 				x += word_width;
 
 			} // end of the line
@@ -224,13 +240,14 @@ public class Display extends JPanel {
 	/**
 	 * Determine if string starts or ends with specific character
 	 * 
-	 * @param Character to look for 
-	 * @param true to check beginning or false to check end
+	 * @param word to look for
+	 * @param start check beginning or false to check end
 	 * 
 	 * @return true if character is found and starts or ends with value
 	 * 
 	 */
 	private boolean hasMarkup(String word, String markup, boolean start) {
+		// TODO: edit this method to return starts with and ends with one string
 		if (start)
 			return word.startsWith(markup);
 		else

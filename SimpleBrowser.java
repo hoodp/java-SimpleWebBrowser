@@ -1,12 +1,9 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +21,6 @@ import javax.swing.JTextField;
  * Created by kurmasz on 12/17/14.
  */
 public class SimpleBrowser {
-
-
 	private JFrame frame;
 	protected JTextField addressBar;
 	private JScrollPane scrollPane;
@@ -34,7 +29,7 @@ public class SimpleBrowser {
 
 	// Caching images prevents the browser from repeatedly fetching the same image from the server
 	// (This repeated fetching is especially annoying when scrolling.)
-	//	protected ImageCache cache = new ImageCache();
+	protected ImageCache cache = new ImageCache();
 
 	// The URL of the currently displayed document;
 	protected MyURL currentURL = null;
@@ -129,11 +124,12 @@ public class SimpleBrowser {
 			// split page text by newline character
 			for (String s : client.getText().split("\n"))
 				lines.add(s);
+
+			display.setBrowser(this);
 			display.setText(lines);
 			frame.repaint();
 
 		} catch (Exception e) {
-			System.out.println("Error: " + e);
 			e.printStackTrace();
 		}
 	}
@@ -141,9 +137,13 @@ public class SimpleBrowser {
 	// Fetch an image from from the server, or return null if 
 	// the image isn't available.
 	protected Image fetchImage(MyURL url) {
-		// TODO:  implement me.
-		// Hint:  Use a new WebTransactionClient object.
-		return null;
+		try {
+			WebTransactionClient client = new WebTransactionClient(url);
+			return client.getImage();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
@@ -152,19 +152,19 @@ public class SimpleBrowser {
 	 * @param urlString the URL of the image to load.
 	 * @return The desired image, or {@code null} if the image isn't available.
 	 */
-	//	public Image getCachedImage(String urlString) {
-	//		MyURL url = new MyURL(urlString, currentURL);
-	//
-	//		// This unusual syntax (the "new ImageCache.ImageLoader" stuff) is an "anonymous inner class.  It is Java's way
-	//		// of allowing us to pass the fetchImage method as a parameter to the ImageCache.getImage.  You may have seen this 
-	//		// syntax before with ActionListeners.  If not, I will be happy to explain it to you.
-	//		return cache.getImage(url, new ImageCache.ImageLoader() {
-	//			@Override
-	//			public Image loadImage(MyURL url) {
-	//				return fetchImage(url);
-	//			}
-	//		});
-	//	}
+	public Image getCachedImage(String urlString) {
+		MyURL url = new MyURL(urlString, currentURL);
+
+		// This unusual syntax (the "new ImageCache.ImageLoader" stuff) is an "anonymous inner class.  It is Java's way
+		// of allowing us to pass the fetchImage method as a parameter to the ImageCache.getImage.  You may have seen this
+		// syntax before with ActionListeners.  If not, I will be happy to explain it to you.
+		return cache.getImage(url, new ImageCache.ImageLoader() {
+			@Override
+			public Image loadImage(MyURL url) {
+				return fetchImage(url);
+			}
+		});
+	}
 
 
 	public static void main(String[] args) {
@@ -174,7 +174,7 @@ public class SimpleBrowser {
 		// "inversion of control").  In general, dependency injection simplifies unit testing.
 		// I this case, I used dependency injection so that I could more easily write a subclass
 		// of this browser that uses a completely different display class.
-		String initial = args.length > 0 ? args[0]  : "http://www.cis.gvsu.edu/~kurmasz/Teaching/Courses/S15/CS371/Assignments/WebBrowser/sampleInput/basic.txt";
+		String initial = args.length > 0 ? args[0]  : "http://www.cis.gvsu.edu/~kurmasz/Teaching/Courses/S15/CS371/Assignments/WebBrowser/sampleInput/subdirImages.txt";
 		new SimpleBrowser("CIS 371 Starter Browser", initial, new Display());
 	}
 

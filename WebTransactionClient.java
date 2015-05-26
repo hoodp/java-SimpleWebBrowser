@@ -1,4 +1,3 @@
-
 /**
  * @author Paul Hood
  */
@@ -12,16 +11,13 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-
 public class WebTransactionClient {
-
 
 	private PrintWriter out;
 	private DataInputStream in;
 	private Socket socket;
 	private String response;   // The entire response string (e.g., "HTTP/1.1 200 Ok")
 	private HashMap<String, String> headers = new HashMap<String, String>();
-
 
 	@SuppressWarnings("deprecation")
 	public WebTransactionClient(MyURL url) throws IOException {
@@ -30,7 +26,7 @@ public class WebTransactionClient {
 		out = new PrintWriter(socket.getOutputStream(), true);
 		
 		// send get request
-		out.printf("GET %s HTTP/1.1\nHost: %s\n\n", url.path(), 
+		out.printf("GET %s HTTP/1.1\nHost: %s\n\n", url.path(),
 				url.domainName());
 		out.flush();
 		
@@ -98,9 +94,9 @@ public class WebTransactionClient {
 		return headers.get(key.toLowerCase());
 	}
 
-
 	@Override
 	protected void finalize() throws Throwable {
+
 		// This method is complete.
 		super.finalize();
 		in.close();
