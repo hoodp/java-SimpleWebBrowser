@@ -60,12 +60,6 @@ public class WebTransactionClient {
 	} // end getText
 
 	public BufferedImage getImage() throws IOException {
-
-		// This function is complete.  The ImageIO class can build an Image object directly from the InputStream.
-		// This is why it was important to use a DataInputStream:  The ImageIO class will read binary data from the stream.
-		// Had you used BufferedReader or something similar when reading the headers, then it is possible some of the 
-		// necessary binary data would have been incorrectly loaded into the buffer.
-
 		return ImageIO.read(in);
 	}
 
@@ -84,13 +78,10 @@ public class WebTransactionClient {
 	}
 
 	public Map<String, String> responseHeaders() {
-		// This method is complete.
 		return headers;
 	}
 
 	public String getHeader(String key) {
-		// This method is complete.
-		// I convert the key to lower case to avoid problems caused when different web servers use different capitalization.
 		return headers.get(key.toLowerCase());
 	}
 

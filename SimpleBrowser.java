@@ -125,10 +125,18 @@ public class SimpleBrowser {
 			// create list of lines to display
 			List<String> lines = new ArrayList<String>();
 
-			// split page text by newline character
-			for (String s : client.getText().split("\n"))
-				lines.add(s);
+			// check for image entered into address bar
+			if (client.getHeader("content-type").contains("image")) {
 
+				// add image url to first line
+				lines.add("<<" + currentURL + ">>");
+			}
+			else {
+
+				// split page text by newline character
+				for (String s : client.getText().split("\n"))
+					lines.add(s);
+			}
 			display.setBrowser(this);
 			display.setText(lines);
 			frame.repaint();
@@ -172,12 +180,6 @@ public class SimpleBrowser {
 
 
 	public static void main(String[] args) {
-
-		// Notice that the display object (the Display) is created *outside* of the 
-		// SimpleBrowser object.  This is an example of "dependency injection" (also called 
-		// "inversion of control").  In general, dependency injection simplifies unit testing.
-		// I this case, I used dependency injection so that I could more easily write a subclass
-		// of this browser that uses a completely different display class.
 		String initial = args.length > 0 ? args[0]  : "http://www.cis.gvsu.edu/~kurmasz/Teaching/Courses/S15/CS371/Assignments/WebBrowser/sampleInput/subdirImages.txt";
         //String initial = args.length > 0 ? args[0] : "http://www.cis.gvsu.edu:80/~kurmasz/Teaching/Courses/S15/CS371/Assignments/WebBrowser/sampleInput/Images/logo1.png";
 		new SimpleBrowser("CIS 371 Starter Browser", initial, new Display());

@@ -100,7 +100,7 @@ public class Display extends JPanel {
 					Image image = browser.getCachedImage(nextWord);
                     g.drawImage(image, x, y - line_height, image.getWidth(null), image.getHeight(null), null);
                     y += image.getHeight(null);
-                    continue;
+					continue;
 				}
 
 				// original style for word
