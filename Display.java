@@ -98,11 +98,9 @@ public class Display extends JPanel {
 						&& hasMarkup(nextWord, ">>", false)) {
 					nextWord = nextWord.substring(2, nextWord.length() - 2);
 					Image image = browser.getCachedImage(nextWord);
-					x = MARGIN;
-					y += line_height + image.getHeight(null);
-					g.drawImage(image, x, y, image.getWidth(null), image.getHeight(null), null);
-					y += line_height;
-					continue;
+                    g.drawImage(image, x, y - line_height, image.getWidth(null), image.getHeight(null), null);
+                    y += image.getHeight(null);
+                    continue;
 				}
 
 				// original style for word

@@ -115,6 +115,10 @@ public class SimpleBrowser {
 			else
 				currentURL = new MyURL(textInBar, currentURL);
 
+            // update address bar text
+            addressBar.setText(currentURL.toString());
+
+
 			// new web transaction client object
 			WebTransactionClient client = new WebTransactionClient(currentURL);
 
@@ -175,6 +179,7 @@ public class SimpleBrowser {
 		// I this case, I used dependency injection so that I could more easily write a subclass
 		// of this browser that uses a completely different display class.
 		String initial = args.length > 0 ? args[0]  : "http://www.cis.gvsu.edu/~kurmasz/Teaching/Courses/S15/CS371/Assignments/WebBrowser/sampleInput/subdirImages.txt";
+        //String initial = args.length > 0 ? args[0] : "http://www.cis.gvsu.edu:80/~kurmasz/Teaching/Courses/S15/CS371/Assignments/WebBrowser/sampleInput/Images/logo1.png";
 		new SimpleBrowser("CIS 371 Starter Browser", initial, new Display());
 	}
 
