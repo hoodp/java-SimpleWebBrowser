@@ -57,6 +57,10 @@ public class Display extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 
+        // reset links if the map is not empty
+        if (links.size() != 0)
+            links.clear();
+
 		// prevents display from messing up while scrolling
 		super.paintComponent(g);
 
@@ -94,7 +98,6 @@ public class Display extends JPanel {
 						&& hasMarkup(nextWord, ">>", false)) {
 					nextWord = nextWord.substring(2, nextWord.length() - 2);
 					Image image = browser.getCachedImage(nextWord);
-					System.out.println(image.getHeight(null) + " " + image.getWidth(null));
 					x = MARGIN;
 					y += line_height + image.getHeight(null);
 					g.drawImage(image, x, y, image.getWidth(null), image.getHeight(null), null);
@@ -190,6 +193,8 @@ public class Display extends JPanel {
 				}
 
 				String wordAndSpace = nextWord + " ";
+                g.setFont(originalFont.deriveFont(style));
+                metrics = g.getFontMetrics();
 				int word_width = metrics.stringWidth(wordAndSpace);
 
 				// If there isn't room for this word, go to the next line
@@ -199,7 +204,7 @@ public class Display extends JPanel {
 				}
 								
 				// draw the word
-				g.setFont(originalFont.deriveFont(style));
+
 				g.drawString(wordAndSpace, x, y);
 				
 				x += word_width;

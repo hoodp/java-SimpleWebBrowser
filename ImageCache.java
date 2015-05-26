@@ -27,10 +27,9 @@ public class ImageCache {
    */
   public Image getImage(MyURL url, ImageLoader loader) {
     if (imageCache.containsKey(url)) {
-      System.out.println("Cached: " + url);
       return imageCache.get(url);
     } else {
-      System.out.println("Not Cached: " + url);
+
       // The image isn't in the cache, so use the loader
       // method to fetch the image from the server.
       Image image = loader.loadImage(url);
